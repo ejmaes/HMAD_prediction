@@ -241,9 +241,9 @@ def fillTimeColumnInterval(res:pd.DataFrame, time_start = None, time_stop = None
     res = res.append(tmp).sort_values(by='tmin').reset_index(drop=True)
     return res
 
-def createNodAnnotations(df, values, nod_threshold, 
-                        smin=0.24, smax=1.04, step=0.08,
-                        use_index=False, dresults=None):
+def createNodAnnotations(df:pd.DataFrame, values:str, nod_threshold:float, 
+                        smin:float=0.24, smax:float=1.04, step:float=0.08,
+                        use_index:bool=False, dresults:pd.DataFrame=None, predictor:str='wgof'):
     """
     Create the automatic nod annotations predicted from the HMAD output data
 
@@ -277,7 +277,7 @@ def createNodAnnotations(df, values, nod_threshold,
     res = fillTimeColumnInterval(res)
 
     # Predictions based on nod_threshold
-    res['prediction'] = res.wgof.apply(lambda x: "NA" if np.isnan(x) else ("nod" if x >= nod_threshold else "no_nod"))
+    res['prediction'] = res[predictor].apply(lambda x: "NA" if np.isnan(x) else ("nod" if x >= nod_threshold else "no_nod"))
     # Thumb Rule here - if between two nods then is nod
     res['before_after'] = pd.concat([   res['prediction'].shift(1).fillna("OUT"), 
             res['prediction'].shift(-1).fillna("OUT")
